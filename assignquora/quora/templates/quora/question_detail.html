@@ -1,0 +1,36 @@
+{% extends 'quora/base.html' %}
+{% block content %}
+<h2>{{ question.content }}</h2>
+<p>Asked by: {{ question.user.username }}</p>
+
+<h3>Answers</h3>
+<ul>
+    {% for answer in answers %}
+    <li>
+        {{ answer.content }} - {{ answer.user.username }}
+        {% if user.is_authenticated %}
+        <a href="{% url 'like_answer' answer.id %}">likes ({{ answer.total_likes }})</a>
+        {% else %}
+    <a href="{% url 'login' %}?next={% url 'like_answer' answer.id %}">likes ({{ answer.total_likes }})</a>
+{% endif %}
+        |
+        {% if user.is_authenticated %}
+        <a href="{% url 'dislike_answer' answer.id %}">Dislike ({{ answer.total_dislikes }})</a>
+        {% else %}
+         <a href="{% url 'login' %}?next={% url 'dislike_answer' answer.id %}">Dislikes ({{ answer.total_dislikes }})</a>
+{% endif %}
+    </li>
+    {% endfor %}
+</ul>
+
+{% if user.is_authenticated %}
+<h3>Your Answer</h3>
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Post Answer</button>
+</form>
+{% else %}
+<p><a href="{% url 'login' %}">Login</a> to answer.</p>
+{% endif %}
+{% endblock %}
